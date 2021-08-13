@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="VideoPlayerStateMachine.MainPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:VideoPlayerStateMachine.Controls"
+    xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+    xmlns:local="clr-namespace:VideoPlayerStateMachine"
+    xmlns:viewModels="clr-namespace:VideoPlayerStateMachine.ViewModels"
+    ios:Page.UseSafeArea="true">
+    <ContentPage.BindingContext>
+        <viewModels:MainViewModel />
+    </ContentPage.BindingContext>
+    <Grid>
+        <controls:VideoPlayer
+            AutoPlay="{Binding CanAutoPlay}"
+            Command="{Binding VideoActionCommand}"
+            Source="https://sec.ch9.ms/ch9/5d93/a1eab4bf-3288-4faf-81c4-294402a85d93/XamarinShow_mid.mp4" />
+        <Label
+            FontSize="Title"
+            HorizontalOptions="Center"
+            Text="{Binding Status}"
+            TextColor="White"
+            VerticalOptions="Start" />
+        <StackLayout
+            Margin="0,0,0,20"
+            HorizontalOptions="CenterAndExpand"
+            Orientation="Horizontal"
+            VerticalOptions="End">
+            <Button
+                Command="{Binding TriggerCommand}"
+                CommandParameter="{x:Static local:VideoTrigger.Play}"
+                FontSize="Medium"
+                IsVisible="{Binding CanPlay}"
+                Text="Play"
+                TextColor="White" />
+            <Button
+                Command="{Binding TriggerCommand}"
+                CommandParameter="{x:Static local:VideoTrigger.Pause}"
+                FontSize="Medium"
+                IsVisible="{Binding CanPause}"
+                Text="Pause"
+                TextColor="White" />
+            <Button
+                Command="{Binding TriggerCommand}"
+                CommandParameter="{x:Static local:VideoTrigger.Stop}"
+                FontSize="Medium"
+                IsVisible="{Binding CanStop}"
+                Text="Stop"
+                TextColor="White" />
+        </StackLayout>
+    </Grid>
+</ContentPage>
