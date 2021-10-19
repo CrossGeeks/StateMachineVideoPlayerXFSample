@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows.Input;
 using Stateless;
 using Xamarin.Forms;
@@ -18,6 +19,8 @@ namespace VideoPlayerStateMachine.ViewModels
 
         public bool CanAutoPlay { get; set; }
 
+        public TimeSpan Position { get; set; }
+
         public ICommand TriggerCommand { get; }
 
         public ICommand VideoActionCommand { get; set; }
@@ -35,7 +38,13 @@ namespace VideoPlayerStateMachine.ViewModels
                    .OnActivate(OnStateEntry)
                    .OnEntry(OnStateEntry)
                    .Permit(VideoTrigger.Pause, VideoState.Paused)
-                   .Permit(VideoTrigger.Stop, VideoState.Stopped);
+                   .Permit(VideoTrigger.Stop, VideoState.Stopped)
+                   .InternalTransition(VideoTrigger.Rewind, ()=> {
+                       Position = Position.Subtract(TimeSpan.FromSeconds(5));
+                   })
+                   .InternalTransition(VideoTrigger.Forward, () => {
+                       Position = Position.Add(TimeSpan.FromSeconds(5));
+                   });
 
             _videoPlayerStateMachine.Configure(VideoState.Paused)
                    .OnEntry(OnStateEntry)

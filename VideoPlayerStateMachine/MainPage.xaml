@@ -7,26 +7,40 @@
     xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
     xmlns:local="clr-namespace:VideoPlayerStateMachine"
     xmlns:viewModels="clr-namespace:VideoPlayerStateMachine.ViewModels"
+    BackgroundColor="Black"
     ios:Page.UseSafeArea="true">
     <ContentPage.BindingContext>
         <viewModels:MainViewModel />
     </ContentPage.BindingContext>
-    <Grid>
-        <controls:VideoPlayer
-            AutoPlay="{Binding CanAutoPlay}"
-            Command="{Binding VideoActionCommand}"
-            Source="https://sec.ch9.ms/ch9/5d93/a1eab4bf-3288-4faf-81c4-294402a85d93/XamarinShow_mid.mp4" />
+    <StackLayout>
+        
         <Label
             FontSize="Title"
             HorizontalOptions="Center"
             Text="{Binding Status}"
             TextColor="White"
-            VerticalOptions="Start" />
-        <StackLayout
-            Margin="0,0,0,20"
+            VerticalOptions="Start"/>
+
+        <Label
+            FontSize="Title"
+            HorizontalOptions="Center"
+            Text="{Binding Position, StringFormat='{}{0:hh\\:mm\\:ss}'}"
+            TextColor="White"
+            VerticalOptions="Start"/>
+
+        <controls:VideoPlayer
+            x:Name="VideoPlayer" 
+            AutoPlay="{Binding CanAutoPlay}"
+            Command="{Binding VideoActionCommand}"
+            Position="{Binding Position, Mode=TwoWay}"
+            VerticalOptions="Start"
+            HeightRequest="400"
+            Source="https://sec.ch9.ms/ch9/5d93/a1eab4bf-3288-4faf-81c4-294402a85d93/XamarinShow_mid.mp4"/>
+
+        <StackLayout 
             HorizontalOptions="CenterAndExpand"
-            Orientation="Horizontal"
-            VerticalOptions="End">
+            VerticalOptions="Start"
+            Orientation="Horizontal">
             <Button
                 Command="{Binding TriggerCommand}"
                 CommandParameter="{x:Static local:VideoTrigger.Play}"
@@ -48,6 +62,34 @@
                 IsVisible="{Binding CanStop}"
                 Text="Stop"
                 TextColor="White" />
+
+             <Button
+                Command="{Binding TriggerCommand}"
+                CommandParameter="{x:Static local:VideoTrigger.Rewind}"
+                 Margin="40,0,0,0"
+                 WidthRequest="30"
+                HeightRequest="30"
+                VerticalOptions="Center"
+                FontSize="Small"
+                CornerRadius="15"
+                IsVisible="{Binding CanStop}"
+                Text="-5"
+                BackgroundColor="White"
+                TextColor="Black" />
+
+             <Button
+                Command="{Binding TriggerCommand}"
+                CommandParameter="{x:Static local:VideoTrigger.Forward}"
+                WidthRequest="30"
+                HeightRequest="30"
+                VerticalOptions="Center"
+                FontSize="Small"
+                CornerRadius="15"
+                IsVisible="{Binding CanStop}"
+                Text="+5"
+                BackgroundColor="White"
+                TextColor="Black" />
+
         </StackLayout>
-    </Grid>
+    </StackLayout>
 </ContentPage>
