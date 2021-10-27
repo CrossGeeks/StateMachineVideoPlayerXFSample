@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Input;
 using Stateless;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace VideoPlayerStateMachine.ViewModels
@@ -17,11 +18,15 @@ namespace VideoPlayerStateMachine.ViewModels
 
         public bool CanPlay { get; private set; }
 
-        public bool CanAutoPlay { get; set; }
+        public bool CanAutoPlay { get; set; } 
 
         public TimeSpan Position { get; set; }
 
         public ICommand TriggerCommand { get; }
+
+        public ICommand ForwardCommand { get; }
+
+        public ICommand RewindCommand { get; }
 
         public ICommand VideoActionCommand { get; set; }
 
@@ -34,16 +39,27 @@ namespace VideoPlayerStateMachine.ViewModels
                    .OnEntry(OnStateEntry)
                    .Permit(VideoTrigger.Play, VideoState.Playing);
 
+            var forwardParamTrigger = _videoPlayerStateMachine.SetTriggerParameters<double>(VideoTrigger.Forward);
+            var rewindParamTrigger = _videoPlayerStateMachine.SetTriggerParameters<double>(VideoTrigger.Rewind);
+
             _videoPlayerStateMachine.Configure(VideoState.Playing)
                    .OnActivate(OnStateEntry)
                    .OnEntry(OnStateEntry)
+                   .PermitReentryIf(VideoTrigger.Forward)
+                   .PermitReentryIf(VideoTrigger.Rewind)
                    .Permit(VideoTrigger.Pause, VideoState.Paused)
                    .Permit(VideoTrigger.Stop, VideoState.Stopped)
-                   .InternalTransition(VideoTrigger.Rewind, ()=> {
-                       Position = Position.Subtract(TimeSpan.FromSeconds(5));
+                   .OnEntryFrom(rewindParamTrigger, (seconds) => {
+                       MainThread.BeginInvokeOnMainThread(() =>
+                       {
+                           Position = Position.Subtract(TimeSpan.FromSeconds(seconds));
+                       });
                    })
-                   .InternalTransition(VideoTrigger.Forward, () => {
-                       Position = Position.Add(TimeSpan.FromSeconds(5));
+                   .OnEntryFrom(forwardParamTrigger, (seconds) => {
+                       MainThread.BeginInvokeOnMainThread(() =>
+                       {
+                           Position = Position.Add(TimeSpan.FromSeconds(seconds));
+                       });
                    });
 
             _videoPlayerStateMachine.Configure(VideoState.Paused)
@@ -55,7 +71,16 @@ namespace VideoPlayerStateMachine.ViewModels
                    .OnEntry(OnStateEntry)
                    .Permit(VideoTrigger.Play, VideoState.Playing);
 
+            
             TriggerCommand = new Command<VideoTrigger>(OnTrigger);
+
+            ForwardCommand = new Command<double>((seconds) => {
+                _videoPlayerStateMachine.Fire(forwardParamTrigger, seconds);
+            });
+
+            RewindCommand = new Command<double>((seconds) => {
+                _videoPlayerStateMachine.Fire(rewindParamTrigger, seconds);
+            });
 
             _videoPlayerStateMachine.Activate();
         }

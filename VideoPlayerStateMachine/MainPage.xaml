@@ -12,21 +12,28 @@
     <ContentPage.BindingContext>
         <viewModels:MainViewModel />
     </ContentPage.BindingContext>
-    <StackLayout>
+    <Grid ColumnDefinitions="Auto, *"
+          RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
         
         <Label
             FontSize="Title"
             HorizontalOptions="Center"
             Text="{Binding Status}"
             TextColor="White"
-            VerticalOptions="Start"/>
+            VerticalOptions="Start"
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"/>
 
         <Label
             FontSize="Title"
             HorizontalOptions="Center"
             Text="{Binding Position, StringFormat='{}{0:hh\\:mm\\:ss}'}"
             TextColor="White"
-            VerticalOptions="Start"/>
+            VerticalOptions="Start"
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"/>
 
         <controls:VideoPlayer
             x:Name="VideoPlayer" 
@@ -35,12 +42,18 @@
             Position="{Binding Position, Mode=TwoWay}"
             VerticalOptions="Start"
             HeightRequest="400"
-            Source="https://sec.ch9.ms/ch9/5d93/a1eab4bf-3288-4faf-81c4-294402a85d93/XamarinShow_mid.mp4"/>
+            Source="https://sec.ch9.ms/ch9/5d93/a1eab4bf-3288-4faf-81c4-294402a85d93/XamarinShow_mid.mp4"
+            Grid.Row="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"/>
 
         <StackLayout 
             HorizontalOptions="CenterAndExpand"
             VerticalOptions="Start"
-            Orientation="Horizontal">
+            Orientation="Horizontal"
+            Grid.Row="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="2">
             <Button
                 Command="{Binding TriggerCommand}"
                 CommandParameter="{x:Static local:VideoTrigger.Play}"
@@ -63,9 +76,10 @@
                 Text="Stop"
                 TextColor="White" />
 
+            
              <Button
-                Command="{Binding TriggerCommand}"
-                CommandParameter="{x:Static local:VideoTrigger.Rewind}"
+                Command="{Binding RewindCommand}"
+                CommandParameter="{Binding Source={x:Reference RewindStepper}, Path=Value}"
                  Margin="40,0,0,0"
                  WidthRequest="30"
                 HeightRequest="30"
@@ -73,23 +87,54 @@
                 FontSize="Small"
                 CornerRadius="15"
                 IsVisible="{Binding CanStop}"
-                Text="-5"
+                Text="{Binding Source={x:Reference RewindStepper}, Path=Value, StringFormat='-{0}'}"
                 BackgroundColor="White"
                 TextColor="Black" />
 
              <Button
-                Command="{Binding TriggerCommand}"
-                CommandParameter="{x:Static local:VideoTrigger.Forward}"
+                Command="{Binding ForwardCommand}"
+                CommandParameter="{Binding Source={x:Reference ForwardStepper}, Path=Value}"
                 WidthRequest="30"
                 HeightRequest="30"
                 VerticalOptions="Center"
                 FontSize="Small"
                 CornerRadius="15"
                 IsVisible="{Binding CanStop}"
-                Text="+5"
+                Text="{Binding Source={x:Reference ForwardStepper}, Path=Value, StringFormat='+{0}'}"
                 BackgroundColor="White"
                 TextColor="Black" />
 
         </StackLayout>
-    </StackLayout>
+
+        <Label Text="Rewind Seconds (-5,+5)"
+               TextColor="White"
+               IsVisible="{Binding CanStop}"
+               Grid.Row="4"
+               Grid.Column="0"/>
+
+        <Stepper Maximum="30" 
+                 Minimum="5"
+                 Increment="5"
+                 BackgroundColor="White"
+                 IsVisible="{Binding CanStop}"
+                 x:Name="RewindStepper"
+                 Grid.Row="4"
+                 Grid.Column="1"/>
+
+         <Label Text="Forward Seconds (-5,+5)"
+                 IsVisible="{Binding CanStop}"
+                TextColor="White"
+                Grid.Row="5"
+                Grid.Column="0"/>
+
+        <Stepper Maximum="30" 
+                 Minimum="5"
+                 Increment="5"
+                 IsVisible="{Binding CanStop}"
+                 BackgroundColor="White"
+                 x:Name="ForwardStepper"
+                 Grid.Row="5"
+                Grid.Column="1"/>
+        
+    </Grid>
 </ContentPage>
